@@ -20,7 +20,6 @@ public class HiloConexion implements Runnable{
         HTTPConexionInternet http= new HTTPConexionInternet();
         if(img==false){
             String respuesta= http.consultarRestaurantes("https://6355acf4da523ceadc05bdbf.mockapi.io/restaurantes");
-            Log.d("respuesa", respuesta);
             Message mensaje = new Message();
             mensaje.arg1=TEXT;
             mensaje.obj=respuesta;
@@ -28,7 +27,6 @@ public class HiloConexion implements Runnable{
         }
         else{
             byte[] respuesta= http.consultarImg("https://static.wikia.nocookie.net/mario/images/e/e3/MPS_Mario.png/revision/latest?cb=20220814154953");
-          //  Log.d("respuesa", respuesta);
             Message mensaje = new Message();
             mensaje.obj=respuesta;
             mensaje.arg1=IMG;

@@ -1,5 +1,7 @@
 package com.example.celitour;
 
+import android.util.Log;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.net.URL;
 public class HTTPConexionInternet {
 
     public String consultarRestaurantes(String endpoint){
+        Log.d("PROBANDOOO", "entro a consultar restaurantes de HTTPConexionInternet");
         try {
             URL url= new URL(endpoint);
             HttpURLConnection connection= (HttpURLConnection)url.openConnection();
@@ -31,6 +34,7 @@ public class HTTPConexionInternet {
 
                 return new String(baos.toByteArray(),"UTF-8");
             }else{
+                Log.d("ERRORRRRR", "error en consultar restaurantes de conexion");
                 throw new IOException();
             }
         } catch (MalformedURLException e) {
