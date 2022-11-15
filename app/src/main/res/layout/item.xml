@@ -10,9 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         card_view:cardCornerRadius="8dp"
-        card_view:cardBackgroundColor="@color/cardview_dark_background"
+        card_view:cardBackgroundColor="@color/purple_200"
         android:layout_margin="10dp"
-        card_view:contentPadding="10dp">
+        card_view:contentPadding="5dp">
 
 <LinearLayout
     android:layout_width="match_parent"
@@ -22,7 +22,7 @@
             android:id="@+id/tvNombreRestaurante"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="20dp"
+            android:paddingTop="10dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
         <TextView
             android:id="@+id/tvDireccion"

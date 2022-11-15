@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import androidx.appcompat.widget.SearchView;
 import android.widget.TextView;
 
 import com.example.celitour.FormularioRestaurante.RestauranteModel;
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
 public class MainActivity extends AppCompatActivity implements Handler.Callback, MyOnClickItem{
-    List<RestauranteModel> restaurantes =new ArrayList<>();
+    ArrayList<RestauranteModel> restaurantes =new ArrayList<>();
     RestauranteAdapter adapter;
     Intent i;
     private int itemSeleccionado;
@@ -50,12 +52,24 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
+        //getMenuInflater().inflate(R.menu.menu, menu);
+
+        //
+        // Armo el menú de la toolbar según el "menu_principal.xml"
+        super.getMenuInflater().inflate(R.menu.menu, menu);
+
+        // Creo el SearchView y su respectivo listener
+        MenuItem menuItem = menu.findItem(R.id.buscar);
+        ListenerSearchView listenerSearchView = new ListenerSearchView(this.restaurantes, this);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setOnQueryTextListener(listenerSearchView);
+
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
        /* if(item.getItemId()==R.id.itmBuscar){
            // i = new Intent(this,UsuarioActivity.class);
            // startActivity(i);
@@ -71,8 +85,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     @Override
     public boolean handleMessage(@NonNull Message message) {
-
-        if(message.arg1==HiloConexion.TEXT) {
+        if(message.arg1 == HiloConexion.TEXT) {
             this.restaurantes = this.parserJsonRestaurantes(message.obj.toString());
 
             adapter = new RestauranteAdapter(restaurantes, this);
@@ -88,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
         return false;
     }
-    private List<RestauranteModel> parserJsonRestaurantes(String string) {
-        List<RestauranteModel> restaurantes = new ArrayList<>();
+    private ArrayList<RestauranteModel> parserJsonRestaurantes(String string) {
+        ArrayList<RestauranteModel> restaurantes = new ArrayList<>();
 
         try {
             JSONArray jsonArray = new JSONArray(string);
@@ -102,20 +115,21 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 String calle = jsonObject.getString("calle");
                 String altura = jsonObject.getString("altura");
                 String entre1 = jsonObject.getString("entre1");
-                String entre2 = "";//jsonObject.getString("entre2");
-                String provincia ="";// jsonObject.getString("provincia");
-                String localidad = "";//jsonObject.getString("localidad");
-                String telefono = "";//jsonObject.getString("telefono");
-                String email = "";//jsonObject.getString("email");
-                String instagram = "";//jsonObject.getString("instagram");
-                String facebook ="";//jsonObject.getString("facebook");
-                String twitter ="";// jsonObject.getString("twitter");
-                String menu = "";//jsonObject.getString("menu");
-                Double latitud =100.00;// Double.valueOf(jsonObject.getString("latitud"));
-                Double longitud = 100.00;//Double.valueOf(jsonObject.getString("longitud"));
-                Boolean activo = true;//Boolean.valueOf(jsonObject.getString("activo"));
-                String web = "";//jsonObject.getString("web");
-                String horario = "";//jsonObject.getString("horario");
+                String entre2 = jsonObject.getString("entre2");
+                String provincia =jsonObject.getString("provincia");
+                String localidad = jsonObject.getString("localidad");
+                String telefono = jsonObject.getString("telefono");
+                String email =(jsonObject.getString("email")!=null)?jsonObject.getString("email"):"";
+                String instagram = "";//(jsonObject.getString("instagram")!=null)?jsonObject.getString("instagram"):"";
+                String facebook ="";//(jsonObject.getString("facebook")!=null)?jsonObject.getString("facebook"):"";
+                String twitter = "";//(jsonObject.getString("twitter")!=null)?jsonObject.getString("twitter"):"";
+                String menu ="";//(jsonObject.getString("menu")!=null)?jsonObject.getString("menu"):"";
+                Double latitud =0.0;//(Double.valueOf(jsonObject.getString("latitud"))!=null)?Double.valueOf(jsonObject.getString("latitud")):0.0;
+                Double longitud = 0.0;//(Double.valueOf(jsonObject.getString("longitud"))!=null)?Double.valueOf(jsonObject.getString("longitud")):0.0;
+                Boolean activo =true;//(Boolean.valueOf(jsonObject.getString("activo"))!=null)?Boolean.valueOf(jsonObject.getString("activo")):false;
+                String web ="";//(jsonObject.getString("web")!=null)?jsonObject.getString("web"):"";
+                String horario ="";//(jsonObject.getString("horario")!=null)?jsonObject.getString("horario"):"";
+
 
 
                 restaurantes.add(new RestauranteModel(id, nombre, calle, altura
@@ -132,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     @Override
     public void onClickItem(int position) {
-        Log.d("click activity", "haciendo click en el activiy main");
+       Intent intentCall =new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+String.valueOf(restaurantes.get(position).getTelefono())));
+       startActivity(intentCall);
     }
 }
