@@ -28,14 +28,14 @@ public class ListenerSearchView implements SearchView.OnQueryTextListener {
 
             if (query.equals(restaurante.getNombre())) {
                 Log.d("Encontro por nombre", restaurante.getNombre());
-                String mensaje = "El rol del usuario es ".concat(restaurante.getCalle());
-                Ventana dialog = new Ventana();//("Usuario encontrado", mensaje, "Cerrar", null, null, null, null);
+                String mensaje = "La direccion del restaurantes es ".concat(restaurante.getCalle().concat(", ").concat(restaurante.getAltura()));
+                Ventana dialog = new Ventana("Restaurante encontrado", mensaje, "Cerrar", null, null, null, null, null);
                 dialog.show(this.activity.getSupportFragmentManager(), "Dialog encontró usuario");
                 return false;
             }
         }
 
-        Ventana dialog = new Ventana();//("Usuario no encontrado", "El usuario ".concat(query).concat(" no esta dentro de la lista"), "Cerrar", null, null, null, null );
+        Ventana dialog = new Ventana("Usuario no encontrado", "El usuario ".concat(query).concat(" no esta dentro de la lista"), "Cerrar", null, null, null, null ,null);
         dialog.show(this.activity.getSupportFragmentManager(), "Dialog NO encontró usuario");
         return false;
     }

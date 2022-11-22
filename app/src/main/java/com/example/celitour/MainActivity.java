@@ -202,13 +202,14 @@ public class MainActivity extends AppCompatActivity implements MyOnClickItem, Ha
             if (query.equals(resto.getNombre())) {
                 Log.d("usuario encontrado", query);
               //  String mensaje = "El rol del usuario es ".concat(usuario.getRol());
-                Ventana dialog = new Ventana();//("Usuario encontrado", mensaje,  null, "Cerrar",null, false,null, null);
+                String mensaje="";
+                Ventana dialog = new Ventana("Usuario encontrado", mensaje,  null, "Cerrar",null, false,null, null);
                 dialog.show(this.getSupportFragmentManager(), "Dialog encontró usuario");
                 return false;
             }
         }
 
-        Ventana dialog = new Ventana();//("Usuario no encontrado", "El usuario ".concat(query).concat(" no esta dentro de la lista"), null, "Cerrar", null, false,null, null );
+        Ventana dialog = new Ventana("Usuario no encontrado", "El usuario ".concat(query).concat(" no esta dentro de la lista"), null, "Cerrar", null, false,null, null );
         dialog.show(this.getSupportFragmentManager(), "Dialog NO encontró usuario");
         return false;
     }
