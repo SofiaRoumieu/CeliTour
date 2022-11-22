@@ -23,6 +23,7 @@ public class HiloConexion implements Runnable{
             Message mensaje = new Message();
             mensaje.arg1=TEXT;
             mensaje.obj=respuesta;
+            Log.d("respuesta run", respuesta);
             handler.sendMessage(mensaje);
         }
         else{

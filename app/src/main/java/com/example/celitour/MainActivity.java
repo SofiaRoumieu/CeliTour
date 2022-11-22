@@ -29,9 +29,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
-public class MainActivity extends AppCompatActivity implements Handler.Callback, MyOnClickItem{
-    ArrayList<RestauranteModel> restaurantes =new ArrayList<>();
+public class MainActivity extends AppCompatActivity implements MyOnClickItem, Handler.Callback , SearchView.OnQueryTextListener{
+    List<RestauranteModel> restaurantes;
+    List<RestauranteModel> restaurantesBuscados;
     RestauranteAdapter adapter;
+    //SharedPreferences prefs;
     Intent i;
     private int itemSeleccionado;
 
@@ -39,23 +41,52 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //para
-        SharedPreferences sp= getSharedPreferences("misRestaurantes",Context.MODE_PRIVATE );
-        SharedPreferences.Editor ed = sp.edit();
-        ed.putString("clave","valor");
-        ed.putInt("edad",36);
-        ed.commit();
 
-        Handler handler = new Handler(this);
-        Thread t1= new Thread(new HiloConexion(handler, false));
-        t1.start();
+        Log.d("sofia - resto", String.valueOf(restaurantes));
+
+        this.restaurantes = this.recuperarRestaurantes();
+        this.actualizarRecyclerView();
+
     }
+
+    private List<RestauranteModel> recuperarRestaurantes() {
+
+        SharedPreferences prefs = this.getSharedPreferences("sharedSofita", Context.MODE_PRIVATE);
+        String restaurantesString = prefs.getString("restaurantes", "sinRestaurantes");
+
+        Log.d("Sofia - listaaaa", restaurantesString);
+        if ("sinRestaurantes".equals(restaurantesString) ) {
+            Handler handler = new Handler(this);
+            Thread t1 = new Thread(new HiloConexion(handler, false));
+            t1.start();
+
+            return new ArrayList<RestauranteModel>();
+        }
+        else {
+            Log.d("Sofia - lista llena", restaurantesString);
+            return this.parserJsonRestaurantes(restaurantesString);
+        }
+    }
+
+    public void actualizarRecyclerView() {
+
+        adapter = new RestauranteAdapter(restaurantes, this);
+        RecyclerView rv = findViewById(R.id.rvRestaurantes);
+        rv.setLayoutManager(new LinearLayoutManager(this));
+        rv.setAdapter(adapter);
+        //this.adapter.notifyDataSetChanged();
+    }
+
+    public void actualizarSharedPreferences() {
+        Log.d("Sofia - actualiza Shar", this.restaurantes.toString());
+        SharedPreferences prefs = this.getSharedPreferences("sharedSofita", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("restaurantes", this.restaurantes.toString());
+        editor.commit();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.menu, menu);
-
-        //
-        // Armo el menú de la toolbar según el "menu_principal.xml"
         super.getMenuInflater().inflate(R.menu.menu, menu);
 
         // Creo el SearchView y su respectivo listener
@@ -87,11 +118,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     public boolean handleMessage(@NonNull Message message) {
         if(message.arg1 == HiloConexion.TEXT) {
             this.restaurantes = this.parserJsonRestaurantes(message.obj.toString());
-
-            adapter = new RestauranteAdapter(restaurantes, this);
+            this.actualizarRecyclerView();
+            Log.d("Sofia - handleMess", String.valueOf(restaurantes));
+            /*adapter = new RestauranteAdapter(restaurantes, this);
             RecyclerView rv = findViewById(R.id.rvRestaurantes);
             rv.setLayoutManager(new LinearLayoutManager(this));
-            rv.setAdapter(adapter);
+            rv.setAdapter(adapter);*/
+            //actualizarRecyclerView();
+            this.actualizarSharedPreferences();
 
         }else if(message.arg1==HiloConexion.IMG){
            /* ImageView img=findViewById(R.id.fotoResto);
@@ -103,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
     private ArrayList<RestauranteModel> parserJsonRestaurantes(String string) {
         ArrayList<RestauranteModel> restaurantes = new ArrayList<>();
-
+        Log.d("recibe", string);
         try {
             JSONArray jsonArray = new JSONArray(string);
 
@@ -119,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 String provincia =jsonObject.getString("provincia");
                 String localidad = jsonObject.getString("localidad");
                 String telefono = jsonObject.getString("telefono");
-                String email =(jsonObject.getString("email")!=null)?jsonObject.getString("email"):"";
+                String email =(jsonObject.has("email"))?jsonObject.getString("email"):"";
                 String instagram = "";//(jsonObject.getString("instagram")!=null)?jsonObject.getString("instagram"):"";
                 String facebook ="";//(jsonObject.getString("facebook")!=null)?jsonObject.getString("facebook"):"";
                 String twitter = "";//(jsonObject.getString("twitter")!=null)?jsonObject.getString("twitter"):"";
@@ -148,5 +182,39 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     public void onClickItem(int position) {
        Intent intentCall =new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+String.valueOf(restaurantes.get(position).getTelefono())));
        startActivity(intentCall);
+    }
+    @Override
+    public void onClickCardResto(int position) {
+
+        Log.d("click en card", String.valueOf(position));
+        //abrir intent con detalle del resto
+       // Intent intentCall =new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+String.valueOf(restaurantes.get(position).getTelefono())));
+        //startActivity(intentCall);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        Log.d("Sofia - buscndoXNombre", query);
+        Log.d("Sofia - buscndoXNombre",  restaurantes.toString());
+        for (int i = 0; i < this.restaurantes.size(); i++) {
+            RestauranteModel resto = this.restaurantes.get(i);
+
+            if (query.equals(resto.getNombre())) {
+                Log.d("usuario encontrado", query);
+              //  String mensaje = "El rol del usuario es ".concat(usuario.getRol());
+                Ventana dialog = new Ventana();//("Usuario encontrado", mensaje,  null, "Cerrar",null, false,null, null);
+                dialog.show(this.getSupportFragmentManager(), "Dialog encontró usuario");
+                return false;
+            }
+        }
+
+        Ventana dialog = new Ventana();//("Usuario no encontrado", "El usuario ".concat(query).concat(" no esta dentro de la lista"), null, "Cerrar", null, false,null, null );
+        dialog.show(this.getSupportFragmentManager(), "Dialog NO encontró usuario");
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
     }
 }

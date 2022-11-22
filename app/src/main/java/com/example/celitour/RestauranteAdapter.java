@@ -15,7 +15,8 @@ import java.util.List;
 public class RestauranteAdapter extends RecyclerView.Adapter<RestauranteViewHolder> {
     List<RestauranteModel> restaurantes;
     private MyOnClickItem listener;
-    public RestauranteAdapter(List<RestauranteModel> restaurantes,MyOnClickItem listener){
+
+    public RestauranteAdapter(List<RestauranteModel> restaurantes, MyOnClickItem listener){
         this.restaurantes=restaurantes;
         this.listener=listener;
     }

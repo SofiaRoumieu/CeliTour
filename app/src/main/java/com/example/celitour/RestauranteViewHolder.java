@@ -5,6 +5,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class RestauranteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -13,6 +14,7 @@ public class RestauranteViewHolder extends RecyclerView.ViewHolder implements Vi
     TextView tvNombreRestaurante;
     TextView tvDireccion;
     Button btnLlamar;
+    CardView crdCardView;
 
 
     public RestauranteViewHolder(View item, MyOnClickItem listener) {
@@ -22,6 +24,8 @@ public class RestauranteViewHolder extends RecyclerView.ViewHolder implements Vi
         this.btnLlamar = item.findViewById(R.id.btnLlamar);
         this.listener=listener;
         this.btnLlamar.setOnClickListener(this);
+        this.crdCardView=item.findViewById(R.id.card_view);
+        this.crdCardView.setOnClickListener(this);
     }
 
     public void setPosition(int position) {
@@ -31,5 +35,6 @@ public class RestauranteViewHolder extends RecyclerView.ViewHolder implements Vi
     @Override
     public void onClick(View view) {
         listener.onClickItem(position);
+        listener.onClickCardResto(position);
     }
 }

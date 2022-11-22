@@ -93,7 +93,7 @@ public class RestauranteModel implements Serializable {
 
     @Override
     public String toString(){
-        return "Restaurante{" +
+        return "{" +
                 "id='" + id + "'"+
                 ",nombre='" + nombre + "'"+
                 ",calle='" + calle + "'"+
