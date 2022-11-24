@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,18 +26,18 @@ public class Ventana extends DialogFragment {
     private String btnNegativo;
     private String btnNeutral;
     private Boolean view;
-    private List<RestauranteModel> restaurantes;
+    private RestauranteModel restaurante;
 
 
     public Ventana(String titulo, String mensaje, String btnPositivo, String btnNegativo,
-                   String btnNeutral, Boolean view, List<RestauranteModel> restaurantes, Activity activity) {
+                   String btnNeutral, Boolean view, RestauranteModel restaurante, Activity activity) {
         this.titulo = titulo;
         this.mensaje = mensaje;
         this.btnPositivo = btnPositivo;
         this.btnNegativo = btnNegativo;
         this.btnNeutral = btnNeutral;
         this.view = view;
-        this.restaurantes=restaurantes;
+        this.restaurante=restaurante;
         this.activity=activity;
     }
 
@@ -43,36 +45,33 @@ public class Ventana extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder= new AlertDialog.Builder(getActivity());
-        builder.setTitle("titulo de mi ventana");
-        //builder.setMessage("Esta seguro?");
-
         //un pedacito de xml mio
         View view = LayoutInflater.from(getContext()).inflate(R.layout.ventana, null);
        // builder.setView(view);
 
-        ClickDialogo click = new ClickDialogo(view);
+        Log.d("restaurante recibido",restaurante.getNombre());
+        /*TextView txtDireccion=view.findViewById(R.id.txtDireccion);
+        TextView txtNombre = view.findViewById(R.id.txtNombre);
+        txtDireccion.setText(restaurante.getCalle().concat(" ").concat(restaurante.getAltura()));
+        txtNombre.setText(restaurante.getNombre());*/
+        ClickDialogo click = new ClickDialogo(view, activity);
 
         if (!("".equals(this.titulo)) && this.titulo != null)
             builder.setTitle(this.titulo);
         if (!("".equals(this.mensaje)) && this.mensaje != null)
             builder.setMessage(this.mensaje);
-        if (!("".equals(this.btnPositivo)) && this.btnPositivo != null)
-            builder.setPositiveButton(this.btnPositivo, click);
-        if (!("".equals(this.btnNegativo)) && this.btnNegativo != null)
-            builder.setNegativeButton(this.btnNegativo, click);
+        //if (!("".equals(this.btnPositivo)) && this.btnPositivo != null)
+       // if (!("".equals(this.btnNeutral)) && this.btnPositivo != null)
+       //     builder.setNeutralButton(this.btnNeutral,click);
+        builder.setPositiveButton("Cerrar", click);
 
-        builder.setView(view);
-       /* // para mandar lista de opciones, no puede tener setMessage ni setView
-        String[] lista=new String[]{"1","2","3"};
-        builder.setItems(lista, click);
+        if(this.view)
+            builder.setView(view);
 
-                //los 3 botones
-        builder.setNegativeButton("No", click);
-        builder.setPositiveButton("Si", click);
-        builder.setNeutralButton("No se", click);*/
-        //aca tambien se hacen los finby id
-
-
+        TextView txtNombre= view.findViewById(R.id.tvNombre);
+        TextView txtDireccion= view.findViewById(R.id.tvDire);
+        txtNombre.setText(restaurante.getNombre());
+        txtDireccion.setText(restaurante.getCalle().concat(" ").concat(restaurante.getAltura()));
         return builder.create();
     }
 }

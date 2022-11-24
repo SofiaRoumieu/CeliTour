@@ -9,6 +9,7 @@ import com.example.celitour.FormularioRestaurante.RestauranteModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ListenerSearchView implements SearchView.OnQueryTextListener {
     private List<RestauranteModel> restaurantes;
@@ -26,16 +27,14 @@ public class ListenerSearchView implements SearchView.OnQueryTextListener {
         for (int i = 0; i < this.restaurantes.size(); i++) {
             RestauranteModel restaurante = this.restaurantes.get(i);
 
-            if (query.equals(restaurante.getNombre())) {
-                Log.d("Encontro por nombre", restaurante.getNombre());
-                String mensaje = "La direccion del restaurantes es ".concat(restaurante.getCalle().concat(", ").concat(restaurante.getAltura()));
-                Ventana dialog = new Ventana("Restaurante encontrado", mensaje, "Cerrar", null, null, null, null, null);
+            if (query.toLowerCase().equals(restaurante.getNombre().toLowerCase())) {
+                Ventana dialog = new Ventana(null, null, "Llamar", "Cerrar", "Compartir", true, restaurante, null);
                 dialog.show(this.activity.getSupportFragmentManager(), "Dialog encontró usuario");
                 return false;
             }
         }
 
-        Ventana dialog = new Ventana("Usuario no encontrado", "El usuario ".concat(query).concat(" no esta dentro de la lista"), "Cerrar", null, null, null, null ,null);
+        Ventana dialog = new Ventana("Restaurante no encontrado", "El restaurante '".concat(query).concat("' no esta dentro de la lista"), null, "Cerrar", null, false, null ,null);
         dialog.show(this.activity.getSupportFragmentManager(), "Dialog NO encontró usuario");
         return false;
     }

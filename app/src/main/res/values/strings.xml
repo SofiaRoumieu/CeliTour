@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">CeliTour</string>
+    <string name="call">Llamar</string>
+    <string name="share">Compartir</string>
+    <string name="details">Detalles</string>
+    <string name="addres">Dirección</string>
+    <string name="phone">Telefono</string>
+    <string name="close">Cerrar</string>
+    <string name="state">Localidad</string>
+    <string name="web">Sitio Web</string>
+    <string name="hours">Horario de atención</string>
+    <string name="instagram">Instagram</string>
 </resources>

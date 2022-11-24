@@ -2,13 +2,18 @@ package com.example.celitour;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +23,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import androidx.appcompat.widget.SearchView;
+
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.celitour.FormularioRestaurante.RestauranteModel;
@@ -31,9 +38,7 @@ import java.util.Dictionary;
 import java.util.List;
 public class MainActivity extends AppCompatActivity implements MyOnClickItem, Handler.Callback , SearchView.OnQueryTextListener{
     List<RestauranteModel> restaurantes;
-    List<RestauranteModel> restaurantesBuscados;
     RestauranteAdapter adapter;
-    //SharedPreferences prefs;
     Intent i;
     private int itemSeleccionado;
 
@@ -41,12 +46,11 @@ public class MainActivity extends AppCompatActivity implements MyOnClickItem, Ha
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Log.d("sofia - resto", String.valueOf(restaurantes));
-
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)!= PermissionChecker.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE},0);
+        }
         this.restaurantes = this.recuperarRestaurantes();
         this.actualizarRecyclerView();
-
     }
 
     private List<RestauranteModel> recuperarRestaurantes() {
@@ -54,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements MyOnClickItem, Ha
         SharedPreferences prefs = this.getSharedPreferences("sharedSofita", Context.MODE_PRIVATE);
         String restaurantesString = prefs.getString("restaurantes", "sinRestaurantes");
 
-        Log.d("Sofia - listaaaa", restaurantesString);
         if ("sinRestaurantes".equals(restaurantesString) ) {
             Handler handler = new Handler(this);
             Thread t1 = new Thread(new HiloConexion(handler, false));
@@ -63,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements MyOnClickItem, Ha
             return new ArrayList<RestauranteModel>();
         }
         else {
-            Log.d("Sofia - lista llena", restaurantesString);
             return this.parserJsonRestaurantes(restaurantesString);
         }
     }
@@ -74,11 +76,9 @@ public class MainActivity extends AppCompatActivity implements MyOnClickItem, Ha
         RecyclerView rv = findViewById(R.id.rvRestaurantes);
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setAdapter(adapter);
-        //this.adapter.notifyDataSetChanged();
     }
 
     public void actualizarSharedPreferences() {
-        Log.d("Sofia - actualiza Shar", this.restaurantes.toString());
         SharedPreferences prefs = this.getSharedPreferences("sharedSofita", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("restaurantes", this.restaurantes.toString());
@@ -100,17 +100,6 @@ public class MainActivity extends AppCompatActivity implements MyOnClickItem, Ha
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-       /* if(item.getItemId()==R.id.itmBuscar){
-           // i = new Intent(this,UsuarioActivity.class);
-           // startActivity(i);
-            Ventana v=new Ventana();
-            v.show(getSupportFragmentManager(),"ventana");
-
-            //Group g= super.findViewById(R.id.group2);
-            //g.setVisible(false);  no funciona
-        }
-        return super.onOptionsItemSelected(item);*/
         return true;
     }
 
@@ -120,11 +109,7 @@ public class MainActivity extends AppCompatActivity implements MyOnClickItem, Ha
             this.restaurantes = this.parserJsonRestaurantes(message.obj.toString());
             this.actualizarRecyclerView();
             Log.d("Sofia - handleMess", String.valueOf(restaurantes));
-            /*adapter = new RestauranteAdapter(restaurantes, this);
-            RecyclerView rv = findViewById(R.id.rvRestaurantes);
-            rv.setLayoutManager(new LinearLayoutManager(this));
-            rv.setAdapter(adapter);*/
-            //actualizarRecyclerView();
+
             this.actualizarSharedPreferences();
 
         }else if(message.arg1==HiloConexion.IMG){
@@ -154,15 +139,15 @@ public class MainActivity extends AppCompatActivity implements MyOnClickItem, Ha
                 String localidad = jsonObject.getString("localidad");
                 String telefono = jsonObject.getString("telefono");
                 String email =(jsonObject.has("email"))?jsonObject.getString("email"):"";
-                String instagram = "";//(jsonObject.getString("instagram")!=null)?jsonObject.getString("instagram"):"";
-                String facebook ="";//(jsonObject.getString("facebook")!=null)?jsonObject.getString("facebook"):"";
-                String twitter = "";//(jsonObject.getString("twitter")!=null)?jsonObject.getString("twitter"):"";
-                String menu ="";//(jsonObject.getString("menu")!=null)?jsonObject.getString("menu"):"";
-                Double latitud =0.0;//(Double.valueOf(jsonObject.getString("latitud"))!=null)?Double.valueOf(jsonObject.getString("latitud")):0.0;
+                String instagram = (jsonObject.has("instagram"))?jsonObject.getString("instagram"):"";
+                String facebook =(jsonObject.has("facebook"))?jsonObject.getString("facebook"):"";
+                String twitter = (jsonObject.has("twitter"))?jsonObject.getString("twitter"):"";
+                String menu =(jsonObject.has("menu"))?jsonObject.getString("menu"):"";
+                Double latitud =0.0;//(Double.valueOf(jsonObject.has("email"))!=null)?Double.valueOf(jsonObject.getString("latitud")):0.0;
                 Double longitud = 0.0;//(Double.valueOf(jsonObject.getString("longitud"))!=null)?Double.valueOf(jsonObject.getString("longitud")):0.0;
                 Boolean activo =true;//(Boolean.valueOf(jsonObject.getString("activo"))!=null)?Boolean.valueOf(jsonObject.getString("activo")):false;
-                String web ="";//(jsonObject.getString("web")!=null)?jsonObject.getString("web"):"";
-                String horario ="";//(jsonObject.getString("horario")!=null)?jsonObject.getString("horario"):"";
+                String web =(jsonObject.has("web"))?jsonObject.getString("web"):"";
+                String horario =(jsonObject.has("horario"))?jsonObject.getString("horario"):"";
 
 
 
@@ -183,24 +168,32 @@ public class MainActivity extends AppCompatActivity implements MyOnClickItem, Ha
        Intent intentCall =new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+String.valueOf(restaurantes.get(position).getTelefono())));
        startActivity(intentCall);
     }
+
+    @Override
+    public void onClickCompartir(int position){
+        Intent share =new Intent(Intent.ACTION_SEND);
+        share.setType("text/plain");
+        share.putExtra(Intent.EXTRA_SUBJECT,"Mirá este restaurante!!");
+        share.putExtra(Intent.EXTRA_TEXT, restaurantes.get(position).getWeb());
+        startActivity(Intent.createChooser(share,"Compartir"));
+    }
     @Override
     public void onClickCardResto(int position) {
 
-        Log.d("click en card", String.valueOf(position));
         //abrir intent con detalle del resto
-       // Intent intentCall =new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+String.valueOf(restaurantes.get(position).getTelefono())));
-        //startActivity(intentCall);
+        i = new Intent(this,RestauranteActivity.class);
+        i.putExtra("restaurante", this.restaurantes.get(position));
+
+        startActivity(i);
+        this.itemSeleccionado = position;
     }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        Log.d("Sofia - buscndoXNombre", query);
-        Log.d("Sofia - buscndoXNombre",  restaurantes.toString());
         for (int i = 0; i < this.restaurantes.size(); i++) {
             RestauranteModel resto = this.restaurantes.get(i);
 
             if (query.equals(resto.getNombre())) {
-                Log.d("usuario encontrado", query);
               //  String mensaje = "El rol del usuario es ".concat(usuario.getRol());
                 String mensaje="";
                 Ventana dialog = new Ventana("Usuario encontrado", mensaje,  null, "Cerrar",null, false,null, null);
@@ -209,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements MyOnClickItem, Ha
             }
         }
 
-        Ventana dialog = new Ventana("Usuario no encontrado", "El usuario ".concat(query).concat(" no esta dentro de la lista"), null, "Cerrar", null, false,null, null );
+        Ventana dialog = new Ventana("Restaurante no encontrado", "El restaurante ".concat(query).concat(" no esta dentro de la lista"), null, "Cerrar", null, false,null, null );
         dialog.show(this.getSupportFragmentManager(), "Dialog NO encontró usuario");
         return false;
     }

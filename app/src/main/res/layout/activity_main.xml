@@ -6,21 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity"
+    android:background="#ba00e5"
     android:paddingLeft="10dp">
-    <LinearLayout
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:orientation="vertical">
-        <TextView
-            android:id="@+id/tvCercaMio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="20dp"
-            android:text="CERCA MIO"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
-
-    </LinearLayout>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRestaurantes"
         android:layout_width="match_parent"
